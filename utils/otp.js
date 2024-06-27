@@ -32,8 +32,35 @@ const generateOtp = () =>
 
 // Send OTP to phone
 const sendOtpPhone = (req, res) => {
-	const phoneno = req.user.phone;
-	const phone = '+91' + phoneno;
+	const phone = req.user.phone;
+	console.log(phone);
+
+	if (!phone) {
+		return res
+			.status(400)
+			.json({ success: false, message: 'Phone number is required' });
+	}
+
+	const otp = generateOtp();
+	otpsPhone[phone] = otp;
+
+	twilioClient.messages
+		.create({
+			body: `Your OTP code is: ${otp}`,
+			from: process.env.TWILIO_PHONE_NUMBER,
+			to: phone,
+		})
+		.then(message => {
+			res.status(200).json({ success: true });
+		})
+		.catch(error => {
+			console.error('Error sending OTP: ', error);
+			res.status(500).json({ success: false, error: error.toString() });
+		});
+};
+const sendOtpPhoneLogin = (req, res) => {
+	const { phone } = req.body;
+
 	console.log(phone);
 
 	if (!phone) {
@@ -62,14 +89,50 @@ const sendOtpPhone = (req, res) => {
 
 // Verify OTP for phone
 const verifyOtpPhone = (req, res) => {
-	const phoneno = req.user.phone;
-	const phone = '+91' + phoneno;
+	const phone = req.user.phone;
 	console.log(otpsPhone);
 	const { otp } = req.body;
 	console.log(otp);
 	if (otpsPhone[phone] && otpsPhone[phone] === otp) {
 		delete otpsPhone[phone]; // Clear OTP after verification
 		return res.status(200).json({ success: true });
+	} else {
+		return res.status(400).json({ success: false, message: 'Invalid OTP' });
+	}
+};
+
+const verifyOtpPhoneLogin = async (req, res) => {
+	const { phone } = req.body;
+	const { otp } = req.body;
+	console.log(phone);
+	console.log(otp);
+	console.log(otpsEmail);
+	if (otpsPhone[phone] && otpsPhone[phone] === otp) {
+		console.log('hello');
+		delete otpsPhone[phone]; // Clear OTP after verification
+		const user = await User.findOne({ phone });
+		if (!user) {
+			return res.status(401).json({ message: 'Invalid email or password' });
+		}
+		const parser = new UAParser(req.headers['user-agent']);
+		const userAgent = parser.getResult();
+		const ipAddress =
+			req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+		user.loginHistory.push({
+			ipAddress,
+			browser: userAgent.browser.name,
+			os: userAgent.os.name,
+			deviceType: userAgent.device.type || 'desktop',
+		});
+		await user.save();
+
+		const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+			expiresIn: '1h',
+		});
+		const sessionId = uuidv4();
+		console.log(sessionId);
+		return res.status(200).json({ name: user.name, token, sessionId });
 	} else {
 		return res.status(400).json({ success: false, message: 'Invalid OTP' });
 	}
@@ -176,4 +239,6 @@ module.exports = {
 	verifyOtpEmail,
 	sendOtpEmailLogin,
 	verifyOtpEmailEmail,
+	verifyOtpPhoneLogin,
+	sendOtpPhoneLogin,
 };

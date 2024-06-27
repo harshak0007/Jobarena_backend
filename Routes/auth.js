@@ -7,6 +7,8 @@ const {
 	verifyOtpEmail,
 	sendOtpEmailLogin,
 	verifyOtpEmailEmail,
+	sendOtpPhoneLogin,
+	verifyOtpPhoneLogin,
 } = require('../utils/otp');
 const verifyToken = require('../middleware/authMiddleware');
 
@@ -34,13 +36,15 @@ router.post('/data', verifyToken, auth.getUser);
 router.post('/userData', verifyToken, auth.getUserData);
 // Phone OTP routes
 router.post('/send-otp-phone', verifyToken, sendOtpPhone);
+router.post('/send-otp-phone-login', sendOtpPhoneLogin);
 router.post('/verify-otp-phone', verifyToken, verifyOtpPhone);
+router.post('/verify-otp-login-phone', verifyOtpPhoneLogin);
 
 // Email OTP routes
 router.post('/send-otp-email', verifyToken, sendOtpEmail);
 router.post('/send-otp-email-login', sendOtpEmailLogin);
 router.post('/verify-otp-email', verifyToken, verifyOtpEmail);
-router.post('/verify-otp-login',verifyOtpEmailEmail);
+router.post('/verify-otp-login', verifyOtpEmailEmail);
 
 router.get('/login-history', verifyToken, auth.getLoginHistory);
 
