@@ -145,7 +145,7 @@ exports.googleCallback = async (req, res) => {
 		});
 		const sessionId = uuidv4();
 		// res.status(200).json({ token, sessionId });
-		res.redirect(`http://localhost:5173?token=${token}&sessionId=${sessionId}`);
+		res.redirect(`https://jobarena.vercel.app/?token=${token}&sessionId=${sessionId}`);
 	} catch (error) {
 		console.error('Error logging in with Google:', error);
 		res.status(500).json({ message: 'Internal server error' });
