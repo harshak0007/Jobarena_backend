@@ -14,7 +14,8 @@ passport.use(
 		{
 			clientID: process.env.GOOGLE_CLIENT_ID,
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-			callbackURL: 'https://jobarena-backend.onrender.com/api/user/google/callback',
+			callbackURL:  'https://jobarena-backend.onrender.com/api/user/google/callback',
+
 		},
 		async (accessToken, refreshToken, profile, done) => {
 			try {
