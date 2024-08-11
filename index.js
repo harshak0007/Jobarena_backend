@@ -7,7 +7,7 @@ const session = require('express-session');
 const cors = require('cors');
 const { connect } = require('./db');
 const router = require('./Routes/index');
-const port = 5000;
+const port = 3000;
 
 app.use(cors());
 app.use(
