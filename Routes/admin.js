@@ -9,7 +9,7 @@ const adminPassword='admin'
 router.post("/adminLogin", (req,res)=>{
     const {username,password}=req.body
     if (username===adminUsername || password===adminPassword) {
-        res.send("Admin is here")
+        res.send({name:adminUsername})
     }
     else{
         res.statusCode(401).send("Unauthrized")
